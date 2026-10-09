@@ -34,4 +34,10 @@
             app:title="Export" />
     </PreferenceCategory>
 
+    <PreferenceCategory app:title="@string/app_version">
+        <Preference
+            app:key="app_version"
+            app:selectable="false" />
+        </PreferenceCategory>
+
 </PreferenceScreen>

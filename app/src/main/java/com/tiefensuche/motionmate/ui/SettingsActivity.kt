@@ -38,6 +38,12 @@ class SettingsActivity : AppCompatActivity() {
     class SettingsFragment : PreferenceFragmentCompat() {
         override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
             setPreferencesFromResource(R.xml.root_preferences, rootKey)
+            val packageInfo = requireContext().packageManager
+            .getPackageInfo(requireContext().packageName, 0)
+
+            findPreference<Preference>("app_version")?.summary =
+            "${packageInfo.versionName} (${packageInfo.longVersionCode})"
+
             findPreference<SeekBarPreference>("step_width")?.setOnPreferenceChangeListener { _, newValue ->
                 Util.stepWidth = newValue as Int
                 true
