@@ -1,14 +1,32 @@
 <!--
   ~ SPDX-License-Identifier: GPL-3.0-only
   -->
-
 <resources>
-
-    <!-- Base application theme. -->
+    <!-- Theme.Material3.DayNight remains active: only the palette is overridden. -->
     <style name="AppTheme" parent="Theme.Material3.DayNight.NoActionBar">
-        <item name="android:navigationBarColor">@android:color/transparent</item>
-        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="colorPrimary">@color/bronze_primary</item>
+        <item name="colorOnPrimary">@color/bronze_on_primary</item>
+        <item name="colorPrimaryContainer">@color/bronze_primary_container</item>
+        <item name="colorOnPrimaryContainer">@color/bronze_on_primary_container</item>
+        <item name="colorSecondary">@color/bronze_secondary</item>
+        <item name="colorOnSecondary">@color/bronze_on_secondary</item>
+        <item name="colorSecondaryContainer">@color/bronze_secondary_container</item>
+        <item name="colorOnSecondaryContainer">@color/bronze_on_secondary_container</item>
+        <item name="colorTertiary">@color/bronze_tertiary</item>
+        <item name="colorOnTertiary">@color/bronze_on_tertiary</item>
+        <item name="colorSurface">@color/bronze_surface</item>
+        <item name="colorOnSurface">@color/bronze_on_surface</item>
+        <item name="colorSurfaceVariant">@color/bronze_surface_variant</item>
+        <item name="colorOnSurfaceVariant">@color/bronze_on_surface_variant</item>
+        <item name="colorOnBackground">@color/bronze_on_surface</item>
+        <item name="colorOutline">@color/bronze_outline</item>
+        <item name="colorAccent">@color/bronze_primary</item>
+        <item name="android:colorAccent">@color/bronze_primary</item>
+        <item name="android:colorBackground">@color/bronze_background</item>
+        <item name="android:windowBackground">@color/bronze_background</item>
+        <item name="android:statusBarColor">@color/bronze_background</item>
+        <item name="android:navigationBarColor">@color/bronze_background</item>
         <item name="android:windowLightStatusBar">?attr/isLightTheme</item>
+        <item name="android:windowLightNavigationBar">?attr/isLightTheme</item>
     </style>
-
 </resources>

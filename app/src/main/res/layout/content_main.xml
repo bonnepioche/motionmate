@@ -2,11 +2,12 @@
 <!--
   ~ SPDX-License-Identifier: GPL-3.0-only
   -->
-
-<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.core.widget.NestedScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/bronze_background">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -14,100 +15,102 @@
         android:orientation="vertical"
         android:fitsSystemWindows="true">
 
+        <!-- Steps and distance counter -->
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:contentPadding="10dp"
-            android:layout_margin="2dp">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="vertical">
-
-                <TextView
-                    android:id="@+id/textViewMeters"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:textSize="36sp"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:id="@+id/textViewSteps"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:textSize="36sp"
-                    android:textStyle="bold" />
-
-            </LinearLayout>
-
-        </com.google.android.material.card.MaterialCardView>
-
-        <com.google.android.material.card.MaterialCardView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:contentPadding="10dp"
-            android:layout_margin="2dp">
+            android:layout_margin="3dp"
+            app:cardCornerRadius="16dp"
+            app:cardBackgroundColor="@color/bronze_surface"
+            app:strokeColor="@color/bronze_outline"
+            app:strokeWidth="1dp"
+            app:contentPadding="14dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
+                <TextView
+                    android:id="@+id/textViewMeters"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:textColor="@color/bronze_primary"
+                    android:textSize="36sp"
+                    android:textStyle="bold" />
+                <TextView
+                    android:id="@+id/textViewSteps"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:textColor="@color/bronze_on_surface"
+                    android:textSize="36sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
 
+        <!-- History and calendar -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="3dp"
+            app:cardCornerRadius="16dp"
+            app:cardBackgroundColor="@color/bronze_surface"
+            app:strokeColor="@color/bronze_outline"
+            app:strokeWidth="1dp"
+            app:contentPadding="14dp">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
                 <TextView
                     android:id="@+id/textViewCalendarDescription"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:textSize="18sp"
-                    android:text="@string/history" />
-
+                    android:text="@string/history"
+                    android:textColor="@color/bronze_primary"
+                    android:textSize="18sp" />
                 <TextView
                     android:id="@+id/textViewCalendarContent"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:textSize="14sp"
-                    android:textAlignment="center" />
-
+                    android:textAlignment="center"
+                    android:textColor="@color/bronze_on_surface_variant"
+                    android:textSize="14sp" />
                 <include layout="@layout/calendar" />
-
             </LinearLayout>
-
         </com.google.android.material.card.MaterialCardView>
 
+        <!-- Weekly bar chart -->
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="300dp"
-            app:contentPadding="10dp"
-            android:layout_margin="2dp">
-
+            android:layout_margin="3dp"
+            app:cardCornerRadius="16dp"
+            app:cardBackgroundColor="@color/bronze_surface"
+            app:strokeColor="@color/bronze_outline"
+            app:strokeWidth="1dp"
+            app:contentPadding="14dp">
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:orientation="vertical">
-
                 <TextView
                     android:id="@+id/textViewChart"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:textColor="@color/bronze_primary"
                     android:textSize="18sp" />
-
                 <com.tiefensuche.motionmate.ui.Chart
                     android:id="@+id/chart"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent" />
-
             </LinearLayout>
-
         </com.google.android.material.card.MaterialCardView>
-
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerView"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
-
     </LinearLayout>
-
 </androidx.core.widget.NestedScrollView>

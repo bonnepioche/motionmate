@@ -1,6 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- MotionMate statistics dashboard - light theme -->
+    <!-- MotionMate DEV bronze palette: light -->
+    <color name="bronze_background">#F7F2EA</color>
+    <color name="bronze_surface">#FFF9F1</color>
+    <color name="bronze_surface_variant">#EDE1D4</color>
+    <color name="bronze_primary">#85502B</color>
+    <color name="bronze_on_primary">#FFFFFF</color>
+    <color name="bronze_primary_container">#EAD2B9</color>
+    <color name="bronze_on_primary_container">#47280E</color>
+    <color name="bronze_secondary">#77604C</color>
+    <color name="bronze_on_secondary">#FFFFFF</color>
+    <color name="bronze_secondary_container">#E7D5C2</color>
+    <color name="bronze_on_secondary_container">#392514</color>
+    <color name="bronze_tertiary">#76532D</color>
+    <color name="bronze_on_tertiary">#FFFFFF</color>
+    <color name="bronze_outline">#C7A98C</color>
+    <color name="bronze_on_surface">#31271E</color>
+    <color name="bronze_on_surface_variant">#65564A</color>
+    <color name="bronze_chart_bar">#AB6A38</color>
+    <!-- Existing streak dashboard colors are retained. -->
     <color name="streak_bronze">#92643D</color>
     <color name="streak_bronze_background">#F5ECE2</color>
     <color name="streak_bronze_border">#BB9777</color>

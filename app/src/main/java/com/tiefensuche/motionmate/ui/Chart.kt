@@ -5,15 +5,15 @@
 package com.tiefensuche.motionmate.ui
 
 import android.content.Context
-import android.graphics.Color
 import android.util.AttributeSet
+import androidx.core.content.ContextCompat
+import com.tiefensuche.motionmate.R
 import com.github.mikephil.charting.charts.BarChart
 import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.BarData
 import com.github.mikephil.charting.data.BarDataSet
 import com.github.mikephil.charting.data.BarEntry
 import com.github.mikephil.charting.formatter.ValueFormatter
-import com.github.mikephil.charting.utils.ColorTemplate
 import com.tiefensuche.motionmate.util.Database
 import java.util.*
 
@@ -48,7 +48,7 @@ internal class Chart : BarChart {
         xAxis.position = XAxis.XAxisPosition.BOTTOM_INSIDE
         xAxis.granularity = 1f
         xAxis.setDrawGridLines(false)
-        xAxis.textColor = Color.GRAY
+        xAxis.textColor = ContextCompat.getColor(context, R.color.bronze_on_surface_variant)
         xAxis.valueFormatter = DayFormatter()
 
         axisLeft.isEnabled = false
@@ -91,11 +91,11 @@ internal class Chart : BarChart {
     internal fun update() {
         val set = BarDataSet(yVals, "StepData")
         set.setDrawIcons(false)
-        set.setColors(*ColorTemplate.MATERIAL_COLORS)
+        set.setColor(ContextCompat.getColor(context, R.color.bronze_chart_bar))
 
         val data = BarData(set)
         data.setValueTextSize(10f)
-        data.setValueTextColor(Color.GRAY)
+        data.setValueTextColor(ContextCompat.getColor(context, R.color.bronze_on_surface_variant))
         data.barWidth = 0.9f
 
         clear()
