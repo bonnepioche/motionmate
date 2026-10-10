@@ -56,9 +56,14 @@ internal class MainActivity : AppCompatActivity() {
     private lateinit var mShoeProgress: ShoeProgressView
     private lateinit var mTextViewCalendarContent: TextView
     private lateinit var mCalendarView: CalendarView
+    private lateinit var mCalendarContainer: View
+    private lateinit var mCalendarToggle: TextView
+    private var mHistoryExpanded = false
     private lateinit var mChart: Chart
     private lateinit var mTextViewChart: TextView
     private var mAdapter: TextItemAdapter = TextItemAdapter()
+    // Dedicated one-card list positioned between daily steps and History.
+    private val mStreakAdapter = TextItemAdapter()
     private lateinit var mMonthlyStepsCard: MotionStatisticsTextItem
     private lateinit var mAverageStepsCard: MotionTextItem
     private lateinit var mOverallStepsCard: MotionStatisticsTextItem
@@ -87,6 +92,15 @@ internal class MainActivity : AppCompatActivity() {
         mChart = findViewById(R.id.chart)
         mTextViewChart = findViewById(R.id.textViewChart)
         mCalendarView = findViewById(R.id.calendar)
+        mCalendarContainer = findViewById(R.id.calendarContainer)
+        mCalendarToggle = findViewById(R.id.textViewCalendarToggle)
+        // Compact History by default; preserve the expanded state on rotation.
+        mHistoryExpanded = savedInstanceState?.getBoolean(HISTORY_EXPANDED_KEY) ?: false
+        mCalendarToggle.setOnClickListener {
+            mHistoryExpanded = !mHistoryExpanded
+            updateHistoryVisibility()
+        }
+        updateHistoryVisibility()
         mCalendarView.minDate = Database.getInstance(this).firstEntry.let {
             if (it == 0L)
                 Util.calendar.timeInMillis
@@ -106,6 +120,14 @@ internal class MainActivity : AppCompatActivity() {
         val mLayoutManager = LinearLayoutManager(this)
         mRecyclerView.layoutManager = mLayoutManager
         mRecyclerView.adapter = mAdapter
+
+        // A separate RecyclerView lets the streak appear before History,
+        // without moving the activity/statistics list itself.
+        findViewById<RecyclerView>(R.id.recyclerViewStreak).apply {
+            layoutManager = LinearLayoutManager(this@MainActivity)
+            isNestedScrollingEnabled = false
+            adapter = mStreakAdapter
+        }
 
         // setup swipeable cards and remove them on swiped, used for activities
         ItemTouchHelper(object : ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT) {
@@ -196,7 +218,7 @@ internal class MainActivity : AppCompatActivity() {
         mStreakDashboardCard = StreakDashboardItem(this)
         mStreakDashboardCard.displayStyle = PreferenceManager.getDefaultSharedPreferences(this)
             .getString("streak_card_style", "current") ?: "current"
-        mAdapter.add(mStreakDashboardCard)
+        mStreakAdapter.add(mStreakDashboardCard)
         mRollingAveragesCard = RollingStepAveragesItem(this)
         mAdapter.add(mRollingAveragesCard)
 
@@ -289,6 +311,19 @@ internal class MainActivity : AppCompatActivity() {
         }
     }
 
+    /** Hide only the calendar. The selected-day summary remains visible. */
+    private fun updateHistoryVisibility() {
+        mCalendarContainer.visibility = if (mHistoryExpanded) View.VISIBLE else View.GONE
+        mCalendarToggle.setText(if (mHistoryExpanded)
+            R.string.history_hide_calendar else R.string.history_show_calendar)
+        mCalendarToggle.contentDescription = mCalendarToggle.text
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        outState.putBoolean(HISTORY_EXPANDED_KEY, mHistoryExpanded)
+        super.onSaveInstanceState(outState)
+    }
+
     private fun updateChart() {
         val min = Calendar.getInstance()
         min.timeInMillis = mSelectedMonth.timeInMillis
@@ -350,6 +385,7 @@ internal class MainActivity : AppCompatActivity() {
     companion object {
 
         const val RECEIVER_TAG = "RECEIVER_TAG"
+        private const val HISTORY_EXPANDED_KEY = "history_expanded"
     }
     private fun updateStreakCards() {
         val preferences = PreferenceManager.getDefaultSharedPreferences(this)
@@ -413,7 +449,7 @@ internal class MainActivity : AppCompatActivity() {
                 mStreakDashboardCard.displayStyle = selectedStyle
                 mStreakDashboardCard.detailsExpanded = false
                 // View type changes: RecyclerView will inflate the selected compact layout.
-                mAdapter.notifyDataSetChanged()
+                mStreakAdapter.notifyDataSetChanged()
             }
             updateStreakCards()
         }

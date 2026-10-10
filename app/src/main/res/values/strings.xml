@@ -11,6 +11,8 @@
         <item quantity="other">%d steps</item>
     </plurals>
     <string name="history">History</string>
+    <string name="history_show_calendar">Show calendar ▾</string>
+    <string name="history_hide_calendar">Hide calendar ▴</string>
     <string name="steps_day_display">On %tD you walked about %.2f km with %d steps.</string>
     <string name="no_entry">No record for %tD.</string>
     <string name="week_display_format">Week %d: %tD - %tD</string>
