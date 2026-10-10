@@ -41,6 +41,7 @@ import java.util.*
 import kotlin.collections.ArrayList
 import com.tiefensuche.motionmate.stats.StepStreakCalculator
 import com.tiefensuche.motionmate.ui.cards.TextItem
+import com.tiefensuche.motionmate.ui.cards.StreakDashboardItem
 
 /**
  * The main activity for the UI of the step counter.
@@ -56,8 +57,7 @@ internal class MainActivity : AppCompatActivity() {
     private lateinit var mMonthlyStepsCard: MotionStatisticsTextItem
     private lateinit var mAverageStepsCard: MotionTextItem
     private lateinit var mOverallStepsCard: MotionStatisticsTextItem
-    private lateinit var mCurrentStreakCard: TextItem
-    private lateinit var mBestStreakCard: TextItem
+    private lateinit var mStreakDashboardCard: StreakDashboardItem
     private var mCurrentSteps: Int = 0
     private var mSelectedMonth = Util.calendar
 
@@ -184,11 +184,8 @@ internal class MainActivity : AppCompatActivity() {
         mOverallStepsCard = MotionStatisticsTextItem(this, R.string.overall_distance, overallSteps)
         mAdapter.add(mOverallStepsCard)
 
-        mCurrentStreakCard = TextItem(this, R.string.current_streak)
-        mBestStreakCard = TextItem(this, R.string.best_streak)
-
-        mAdapter.add(mCurrentStreakCard)
-        mAdapter.add(mBestStreakCard)
+        mStreakDashboardCard = StreakDashboardItem(this)
+        mAdapter.add(mStreakDashboardCard)
 
         updateStreakCards()
 
@@ -362,18 +359,12 @@ internal class MainActivity : AppCompatActivity() {
             goal = goal
         )
 
-        mCurrentStreakCard.setContent(
-            getString(R.string.streak_days, result.current)
-        )
-        mBestStreakCard.setContent(
-            getString(R.string.streak_days, result.best)
-        )
+        mStreakDashboardCard.updateStats(result.current, result.best, goal)
     }
     override fun onResume() {
         super.onResume()
 
-        if (::mCurrentStreakCard.isInitialized &&
-            ::mBestStreakCard.isInitialized) {
+        if (::mStreakDashboardCard.isInitialized) {
             updateStreakCards()
             }
     }

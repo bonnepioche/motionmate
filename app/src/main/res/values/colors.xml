@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- MotionMate statistics dashboard - light theme -->
+    <color name="streak_bronze">#92643D</color>
+    <color name="streak_bronze_background">#F5ECE2</color>
+    <color name="streak_bronze_border">#BB9777</color>
+</resources>

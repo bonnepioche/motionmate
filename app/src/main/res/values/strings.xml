@@ -32,4 +32,6 @@
     <string name="current_streak">Current streak</string>
     <string name="best_streak">Best streak</string>
     <string name="streak_days">%1$d days</string>
+    <string name="streak_best_summary">Best streak: %1$s</string>
+    <string name="streak_goal_summary">Daily goal: %1$s steps</string>
 </resources>

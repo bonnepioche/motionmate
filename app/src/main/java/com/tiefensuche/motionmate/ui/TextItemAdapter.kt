@@ -13,6 +13,7 @@ import android.widget.ImageButton
 import android.widget.TextView
 import com.tiefensuche.motionmate.R
 import com.tiefensuche.motionmate.ui.cards.TextItem
+import com.tiefensuche.motionmate.ui.cards.StreakDashboardItem
 import java.util.*
 
 /**
@@ -43,9 +44,13 @@ internal class TextItemAdapter : RecyclerView.Adapter<TextItemAdapter.ViewHolder
         return mDataset[index]
     }
 
+    override fun getItemViewType(position: Int): Int =
+        if (mDataset[position] is StreakDashboardItem) 1 else 0
+
     override fun onCreateViewHolder(parent: ViewGroup,
                                     viewType: Int): ViewHolder {
-        val v = LayoutInflater.from(parent.context).inflate(R.layout.cardview_text, parent, false)
+        val layout = if (viewType == 1) R.layout.cardview_streak else R.layout.cardview_text
+        val v = LayoutInflater.from(parent.context).inflate(layout, parent, false)
         return ViewHolder(v)
     }
 
@@ -53,19 +58,27 @@ internal class TextItemAdapter : RecyclerView.Adapter<TextItemAdapter.ViewHolder
         val item = mDataset[position]
         holder.mTextViewDescription.text = item.description
         holder.mTextViewContent.text = item.content
-        if (item.buttonClickListener != null) {
+        if (item is StreakDashboardItem) {
+            holder.mBestStreak?.text = item.bestText
+            holder.mStreakGoal?.text = item.goalText
+        }
+        if (item.buttonClickListener != null && holder.mImageButton != null) {
             holder.mImageButton.setOnClickListener(item.buttonClickListener)
             holder.mImageButton.setImageResource(android.R.drawable.ic_media_pause)
         } else {
-            holder.mImageButton.visibility = View.GONE
+            holder.mImageButton?.visibility = View.GONE
         }
         item.setUpdateListener(object : TextItem.UpdateListener {
             override fun update(text: String?) {
                 holder.mTextViewContent.text = text
+                if (item is StreakDashboardItem) {
+                    holder.mBestStreak?.text = item.bestText
+                    holder.mStreakGoal?.text = item.goalText
+                }
             }
 
             override fun updateIcon(id: Int) {
-                holder.mImageButton.setImageResource(id)
+                holder.mImageButton?.setImageResource(id)
             }
         })
     }
@@ -77,7 +90,9 @@ internal class TextItemAdapter : RecyclerView.Adapter<TextItemAdapter.ViewHolder
     internal inner class ViewHolder(v: View) : RecyclerView.ViewHolder(v) {
         internal val mTextViewDescription: TextView = v.findViewById(R.id.textViewDescription)
         internal val mTextViewContent: TextView = v.findViewById(R.id.textViewContent)
-        internal val mImageButton: ImageButton = v.findViewById(R.id.imageButton)
+        internal val mImageButton: ImageButton? = v.findViewById(R.id.imageButton)
+        internal val mBestStreak: TextView? = v.findViewById(R.id.textViewBestStreak)
+        internal val mStreakGoal: TextView? = v.findViewById(R.id.textViewStreakGoal)
     }
 
 }
