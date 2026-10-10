@@ -188,6 +188,8 @@ internal class MainActivity : AppCompatActivity() {
         mAdapter.add(mOverallStepsCard)
 
         mStreakDashboardCard = StreakDashboardItem(this)
+        mStreakDashboardCard.displayStyle = PreferenceManager.getDefaultSharedPreferences(this)
+            .getString("streak_card_style", "current") ?: "current"
         mAdapter.add(mStreakDashboardCard)
         mRollingAveragesCard = RollingStepAveragesItem(this)
         mAdapter.add(mRollingAveragesCard)
@@ -381,7 +383,15 @@ internal class MainActivity : AppCompatActivity() {
         mCachedHistory = null
 
         if (::mStreakDashboardCard.isInitialized) {
-            updateStreakCards()
+            val selectedStyle = PreferenceManager.getDefaultSharedPreferences(this)
+                .getString("streak_card_style", "current") ?: "current"
+            if (mStreakDashboardCard.displayStyle != selectedStyle) {
+                mStreakDashboardCard.displayStyle = selectedStyle
+                mStreakDashboardCard.detailsExpanded = false
+                // View type changes: RecyclerView will inflate the selected compact layout.
+                mAdapter.notifyDataSetChanged()
             }
+            updateStreakCards()
+        }
     }
 }

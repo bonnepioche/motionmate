@@ -45,8 +45,12 @@ internal class TextItemAdapter : RecyclerView.Adapter<TextItemAdapter.ViewHolder
         return mDataset[index]
     }
 
-    override fun getItemViewType(position: Int): Int = when (mDataset[position]) {
-        is StreakDashboardItem -> 1
+    override fun getItemViewType(position: Int): Int = when (val item = mDataset[position]) {
+        is StreakDashboardItem -> when (item.displayStyle) {
+            "compact_b" -> 3
+            "compact_c" -> 4
+            else -> 1
+        }
         is RollingStepAveragesItem -> 2
         else -> 0
     }
@@ -56,6 +60,8 @@ internal class TextItemAdapter : RecyclerView.Adapter<TextItemAdapter.ViewHolder
         val layout = when (viewType) {
             1 -> R.layout.cardview_streak
             2 -> R.layout.cardview_averages
+            3 -> R.layout.cardview_streak_compact_b
+            4 -> R.layout.cardview_streak_compact_c
             else -> R.layout.cardview_text
         }
         val v = LayoutInflater.from(parent.context).inflate(layout, parent, false)
@@ -64,12 +70,31 @@ internal class TextItemAdapter : RecyclerView.Adapter<TextItemAdapter.ViewHolder
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = mDataset[position]
+        val compact = item is StreakDashboardItem && item.displayStyle != "current"
         holder.mTextViewDescription.text = item.description
         holder.mTextViewContent.text = item.content
         if (item is StreakDashboardItem) {
-            holder.mBestStreak?.text = item.bestText
+            holder.mBestStreak?.text = if (compact) item.compactBestText else item.bestText
             holder.mStreakGoal?.text = item.goalText
             holder.mBestPeriod?.text = item.periodText
+            fun syncDetails() {
+                holder.mBestPeriod?.visibility = if (!compact ||
+                    (item.detailsExpanded && item.periodText.isNotEmpty())) View.VISIBLE else View.GONE
+                holder.mStreakGoal?.visibility = if (!compact || item.detailsExpanded) View.VISIBLE else View.GONE
+            }
+            syncDetails()
+            if (compact) {
+                holder.itemView.isFocusable = true
+                holder.itemView.setOnClickListener {
+                    item.detailsExpanded = !item.detailsExpanded
+                    syncDetails()
+                }
+            } else {
+                holder.itemView.setOnClickListener(null)
+                holder.itemView.isFocusable = false
+            }
+        } else {
+            holder.itemView.setOnClickListener(null)
         }
         if (item.buttonClickListener != null && holder.mImageButton != null) {
             holder.mImageButton.setOnClickListener(item.buttonClickListener)
@@ -81,7 +106,7 @@ internal class TextItemAdapter : RecyclerView.Adapter<TextItemAdapter.ViewHolder
             override fun update(text: String?) {
                 holder.mTextViewContent.text = text
                 if (item is StreakDashboardItem) {
-                    holder.mBestStreak?.text = item.bestText
+                    holder.mBestStreak?.text = if (compact) item.compactBestText else item.bestText
                     holder.mStreakGoal?.text = item.goalText
                     holder.mBestPeriod?.text = item.periodText
                 }

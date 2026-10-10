@@ -13,6 +13,12 @@ import java.util.Date
 internal class StreakDashboardItem(private val context: Context) :
     TextItem(context, R.string.current_streak) {
 
+    /** Stored UI choice: original, filled compact B, or outlined compact C. */
+    var displayStyle: String = "current"
+    var detailsExpanded: Boolean = false
+    var compactBestText: String = ""
+        private set
+
     var bestText: String = ""
         private set
     var goalText: String = ""
@@ -28,8 +34,9 @@ internal class StreakDashboardItem(private val context: Context) :
         } else {
             ""
         }
+        compactBestText = context.getString(R.string.streak_days, best)
         bestText = context.getString(R.string.streak_best_summary,
-            context.getString(R.string.streak_days, best))
+            compactBestText)
         goalText = context.getString(R.string.streak_goal_summary,
             NumberFormat.getIntegerInstance().format(goal))
         // Triggers the existing adapter update listener, including best and goal labels.

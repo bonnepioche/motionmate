@@ -33,6 +33,13 @@
             app:key="theme"
             app:title="@string/theme"
             app:useSimpleSummaryProvider="true" />
+        <ListPreference
+            app:key="streak_card_style"
+            app:title="@string/streak_card_style_title"
+            app:entries="@array/streak_card_style_entries"
+            app:entryValues="@array/streak_card_style_values"
+            app:defaultValue="current"
+            app:useSimpleSummaryProvider="true" />
     </PreferenceCategory>
 
     <PreferenceCategory app:title="@string/data">

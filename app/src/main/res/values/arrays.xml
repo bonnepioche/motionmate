@@ -14,4 +14,14 @@
         <item>light</item>
         <item>dark</item>
     </string-array>
+    <string-array name="streak_card_style_entries">
+        <item>Current (classic)</item>
+        <item>Compact B (filled bronze)</item>
+        <item>Compact C (outlined bronze)</item>
+    </string-array>
+    <string-array name="streak_card_style_values">
+        <item>current</item>
+        <item>compact_b</item>
+        <item>compact_c</item>
+    </string-array>
 </resources>
