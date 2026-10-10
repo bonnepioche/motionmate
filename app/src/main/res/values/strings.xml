@@ -29,6 +29,8 @@
     <string name="theme">Theme</string>
     <string name="app_version">App version</string>
     <string name="daily_step_goal">Daily step goal</string>
+    <string name="daily_goal_progress">%1$s / %2$s steps · %3$d%%</string>
+    <string name="shoe_progress_description">Shoe progress: %1$d percent of daily goal</string>
     <string name="current_streak">Current streak</string>
     <string name="best_streak">Best streak</string>
     <string name="streak_days">%1$d days</string>

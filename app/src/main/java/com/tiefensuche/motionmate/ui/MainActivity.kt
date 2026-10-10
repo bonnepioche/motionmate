@@ -43,6 +43,8 @@ import com.tiefensuche.motionmate.stats.RollingStepAverages
 import com.tiefensuche.motionmate.ui.cards.TextItem
 import com.tiefensuche.motionmate.ui.cards.StreakDashboardItem
 import com.tiefensuche.motionmate.ui.cards.RollingStepAveragesItem
+import com.tiefensuche.motionmate.stats.DailyGoalProgress
+import java.text.NumberFormat
 
 /**
  * The main activity for the UI of the step counter.
@@ -50,6 +52,8 @@ import com.tiefensuche.motionmate.ui.cards.RollingStepAveragesItem
 internal class MainActivity : AppCompatActivity() {
     private lateinit var mTextViewSteps: TextView
     private lateinit var mTextViewMeters: TextView
+    private lateinit var mTextViewGoalProgress: TextView
+    private lateinit var mShoeProgress: ShoeProgressView
     private lateinit var mTextViewCalendarContent: TextView
     private lateinit var mCalendarView: CalendarView
     private lateinit var mChart: Chart
@@ -76,6 +80,8 @@ internal class MainActivity : AppCompatActivity() {
 
         mTextViewSteps = findViewById(R.id.textViewSteps)
         mTextViewMeters = findViewById(R.id.textViewMeters)
+        mTextViewGoalProgress = findViewById(R.id.textViewGoalProgress)
+        mShoeProgress = findViewById(R.id.shoeProgress)
         val mRecyclerView = findViewById<RecyclerView>(R.id.recyclerView)
         mTextViewCalendarContent = findViewById(R.id.textViewCalendarContent)
         mChart = findViewById(R.id.chart)
@@ -236,6 +242,7 @@ internal class MainActivity : AppCompatActivity() {
         // update current today's steps in the header
         mCurrentSteps = steps
 
+        updateDailyGoalProgress(steps)
         updateStreakCards()
 
         mTextViewMeters.text = String.format(getString(R.string.meters_today), Util.stepsToMeters(steps))
@@ -361,6 +368,22 @@ internal class MainActivity : AppCompatActivity() {
         mRollingAveragesCard.updateStats(RollingStepAverages.calculate(history))
     }
 
+    /** Update the live progress; the icon fills from 0 to 100%, the text may exceed 100%. */
+    private fun updateDailyGoalProgress(steps: Int) {
+        val goal = PreferenceManager.getDefaultSharedPreferences(this)
+            .getInt("daily_step_goal", 10000)
+        val state = DailyGoalProgress.calculate(steps.coerceAtLeast(0), goal.coerceAtLeast(1))
+        mShoeProgress.setProgress(state.fillFraction)
+        val formatter = NumberFormat.getIntegerInstance()
+        mTextViewGoalProgress.text = getString(
+            R.string.daily_goal_progress,
+            formatter.format(steps), formatter.format(goal), state.percent
+        )
+        mShoeProgress.contentDescription = getString(
+            R.string.shoe_progress_description, state.percent
+        )
+    }
+
     /** Keep historical rows in memory between counter updates; refresh daily or after Settings. */
     private fun getCachedHistory(): List<Pair<Long, Int>> {
         val today = Util.calendar.timeInMillis
@@ -382,6 +405,7 @@ internal class MainActivity : AppCompatActivity() {
         // An import may have changed history while the Settings screen was open.
         mCachedHistory = null
 
+        if (::mShoeProgress.isInitialized) updateDailyGoalProgress(mCurrentSteps)
         if (::mStreakDashboardCard.isInitialized) {
             val selectedStyle = PreferenceManager.getDefaultSharedPreferences(this)
                 .getString("streak_card_style", "current") ?: "current"
