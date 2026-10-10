@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="progress_icon_title">Icône de progression</string>
+    <string name="goal_progress_description">Objectif quotidien atteint à %1$d pour cent</string>
+</resources>

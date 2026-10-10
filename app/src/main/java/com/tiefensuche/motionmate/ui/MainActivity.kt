@@ -53,7 +53,7 @@ internal class MainActivity : AppCompatActivity() {
     private lateinit var mTextViewSteps: TextView
     private lateinit var mTextViewMeters: TextView
     private lateinit var mTextViewGoalProgress: TextView
-    private lateinit var mShoeProgress: ShoeProgressView
+    private lateinit var mGoalProgress: GoalProgressView
     private lateinit var mTextViewCalendarContent: TextView
     private lateinit var mCalendarView: CalendarView
     private lateinit var mCalendarContainer: View
@@ -86,7 +86,7 @@ internal class MainActivity : AppCompatActivity() {
         mTextViewSteps = findViewById(R.id.textViewSteps)
         mTextViewMeters = findViewById(R.id.textViewMeters)
         mTextViewGoalProgress = findViewById(R.id.textViewGoalProgress)
-        mShoeProgress = findViewById(R.id.shoeProgress)
+        mGoalProgress = findViewById(R.id.goalProgress)
         val mRecyclerView = findViewById<RecyclerView>(R.id.recyclerView)
         mTextViewCalendarContent = findViewById(R.id.textViewCalendarContent)
         mChart = findViewById(R.id.chart)
@@ -409,14 +409,18 @@ internal class MainActivity : AppCompatActivity() {
         val goal = PreferenceManager.getDefaultSharedPreferences(this)
             .getInt("daily_step_goal", 10000)
         val state = DailyGoalProgress.calculate(steps.coerceAtLeast(0), goal.coerceAtLeast(1))
-        mShoeProgress.setProgress(state.fillFraction)
+        // Re-read the preference on each update and after returning from Settings.
+        val iconStyle = PreferenceManager.getDefaultSharedPreferences(this)
+            .getString("progress_icon_style", "05") ?: "05"
+        mGoalProgress.setIconStyle(iconStyle)
+        mGoalProgress.setProgress(state.fillFraction, state.percent)
         val formatter = NumberFormat.getIntegerInstance()
         mTextViewGoalProgress.text = getString(
             R.string.daily_goal_progress,
             formatter.format(steps), formatter.format(goal), state.percent
         )
-        mShoeProgress.contentDescription = getString(
-            R.string.shoe_progress_description, state.percent
+        mGoalProgress.contentDescription = getString(
+            R.string.goal_progress_description, state.percent
         )
     }
 
@@ -441,7 +445,7 @@ internal class MainActivity : AppCompatActivity() {
         // An import may have changed history while the Settings screen was open.
         mCachedHistory = null
 
-        if (::mShoeProgress.isInitialized) updateDailyGoalProgress(mCurrentSteps)
+        if (::mGoalProgress.isInitialized) updateDailyGoalProgress(mCurrentSteps)
         if (::mStreakDashboardCard.isInitialized) {
             val selectedStyle = PreferenceManager.getDefaultSharedPreferences(this)
                 .getString("streak_card_style", "current") ?: "current"

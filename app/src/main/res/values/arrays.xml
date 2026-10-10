@@ -24,4 +24,20 @@
         <item>compact_b</item>
         <item>compact_c</item>
     </string-array>
+    <string-array name="progress_icon_entries">
+        <item>01 · Footprints</item>
+        <item>02 · Walking person</item>
+        <item>03 · Winding path</item>
+        <item>04 · Mountain</item>
+        <item>05 · Circular gauge (default)</item>
+        <item>06 · Growing plant</item>
+        <item>07 · Heart</item>
+        <item>08 · Stairs</item>
+        <item>09 · Flame</item>
+        <item>10 · Star</item>
+    </string-array>
+    <string-array name="progress_icon_values">
+        <item>01</item><item>02</item><item>03</item><item>04</item><item>05</item>
+        <item>06</item><item>07</item><item>08</item><item>09</item><item>10</item>
+    </string-array>
 </resources>

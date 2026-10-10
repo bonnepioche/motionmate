@@ -40,6 +40,13 @@
             app:entryValues="@array/streak_card_style_values"
             app:defaultValue="current"
             app:useSimpleSummaryProvider="true" />
+        <ListPreference
+            app:key="progress_icon_style"
+            app:title="@string/progress_icon_title"
+            app:entries="@array/progress_icon_entries"
+            app:entryValues="@array/progress_icon_values"
+            app:defaultValue="05"
+            app:useSimpleSummaryProvider="true" />
     </PreferenceCategory>
 
     <PreferenceCategory app:title="@string/data">
