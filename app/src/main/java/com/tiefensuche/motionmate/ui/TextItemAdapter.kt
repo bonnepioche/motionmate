@@ -14,6 +14,7 @@ import android.widget.TextView
 import com.tiefensuche.motionmate.R
 import com.tiefensuche.motionmate.ui.cards.TextItem
 import com.tiefensuche.motionmate.ui.cards.StreakDashboardItem
+import com.tiefensuche.motionmate.ui.cards.RollingStepAveragesItem
 import java.util.*
 
 /**
@@ -44,12 +45,19 @@ internal class TextItemAdapter : RecyclerView.Adapter<TextItemAdapter.ViewHolder
         return mDataset[index]
     }
 
-    override fun getItemViewType(position: Int): Int =
-        if (mDataset[position] is StreakDashboardItem) 1 else 0
+    override fun getItemViewType(position: Int): Int = when (mDataset[position]) {
+        is StreakDashboardItem -> 1
+        is RollingStepAveragesItem -> 2
+        else -> 0
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup,
                                     viewType: Int): ViewHolder {
-        val layout = if (viewType == 1) R.layout.cardview_streak else R.layout.cardview_text
+        val layout = when (viewType) {
+            1 -> R.layout.cardview_streak
+            2 -> R.layout.cardview_averages
+            else -> R.layout.cardview_text
+        }
         val v = LayoutInflater.from(parent.context).inflate(layout, parent, false)
         return ViewHolder(v)
     }
@@ -61,6 +69,7 @@ internal class TextItemAdapter : RecyclerView.Adapter<TextItemAdapter.ViewHolder
         if (item is StreakDashboardItem) {
             holder.mBestStreak?.text = item.bestText
             holder.mStreakGoal?.text = item.goalText
+            holder.mBestPeriod?.text = item.periodText
         }
         if (item.buttonClickListener != null && holder.mImageButton != null) {
             holder.mImageButton.setOnClickListener(item.buttonClickListener)
@@ -74,6 +83,7 @@ internal class TextItemAdapter : RecyclerView.Adapter<TextItemAdapter.ViewHolder
                 if (item is StreakDashboardItem) {
                     holder.mBestStreak?.text = item.bestText
                     holder.mStreakGoal?.text = item.goalText
+                    holder.mBestPeriod?.text = item.periodText
                 }
             }
 
@@ -93,6 +103,7 @@ internal class TextItemAdapter : RecyclerView.Adapter<TextItemAdapter.ViewHolder
         internal val mImageButton: ImageButton? = v.findViewById(R.id.imageButton)
         internal val mBestStreak: TextView? = v.findViewById(R.id.textViewBestStreak)
         internal val mStreakGoal: TextView? = v.findViewById(R.id.textViewStreakGoal)
+        internal val mBestPeriod: TextView? = v.findViewById(R.id.textViewBestPeriod)
     }
 
 }

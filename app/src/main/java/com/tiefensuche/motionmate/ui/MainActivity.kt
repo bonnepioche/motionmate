@@ -40,8 +40,10 @@ import com.tiefensuche.motionmate.util.Util
 import java.util.*
 import kotlin.collections.ArrayList
 import com.tiefensuche.motionmate.stats.StepStreakCalculator
+import com.tiefensuche.motionmate.stats.RollingStepAverages
 import com.tiefensuche.motionmate.ui.cards.TextItem
 import com.tiefensuche.motionmate.ui.cards.StreakDashboardItem
+import com.tiefensuche.motionmate.ui.cards.RollingStepAveragesItem
 
 /**
  * The main activity for the UI of the step counter.
@@ -58,6 +60,9 @@ internal class MainActivity : AppCompatActivity() {
     private lateinit var mAverageStepsCard: MotionTextItem
     private lateinit var mOverallStepsCard: MotionStatisticsTextItem
     private lateinit var mStreakDashboardCard: StreakDashboardItem
+    private lateinit var mRollingAveragesCard: RollingStepAveragesItem
+    private var mCachedHistory: List<Pair<Long, Int>>? = null
+    private var mCachedHistoryDay: Long = Long.MIN_VALUE
     private var mCurrentSteps: Int = 0
     private var mSelectedMonth = Util.calendar
 
@@ -186,6 +191,8 @@ internal class MainActivity : AppCompatActivity() {
 
         mStreakDashboardCard = StreakDashboardItem(this)
         mAdapter.add(mStreakDashboardCard)
+        mRollingAveragesCard = RollingStepAveragesItem(this)
+        mAdapter.add(mRollingAveragesCard)
 
         updateStreakCards()
 
@@ -341,28 +348,39 @@ internal class MainActivity : AppCompatActivity() {
         val preferences = PreferenceManager.getDefaultSharedPreferences(this)
         val goal = preferences.getInt("daily_step_goal", 10000)
 
-        val database = Database.getInstance(this)
-        val first = database.firstEntry
-        val last = database.lastEntry
-
-        val history = if (first != 0L) {
-            database.getEntries(first, last).map { entry ->
-                entry.timestamp to entry.steps
-            }
-        } else {
-            emptyList()
-        }
-
+        val history = getCachedHistory()
         val result = StepStreakCalculator.calculate(
             history = history,
             todaySteps = mCurrentSteps,
             goal = goal
         )
 
-        mStreakDashboardCard.updateStats(result.current, result.best, goal)
+        mStreakDashboardCard.updateStats(
+            result.current, result.best, goal, result.bestStart, result.bestEnd
+        )
+        mRollingAveragesCard.updateStats(RollingStepAverages.calculate(history))
+    }
+
+    /** Keep historical rows in memory between counter updates; refresh daily or after Settings. */
+    private fun getCachedHistory(): List<Pair<Long, Int>> {
+        val today = Util.calendar.timeInMillis
+        if (mCachedHistory == null || mCachedHistoryDay != today) {
+            val database = Database.getInstance(this)
+            val first = database.firstEntry
+            val last = database.lastEntry
+            mCachedHistory = if (first != 0L) {
+                database.getEntries(first, last).map { it.timestamp to it.steps }
+            } else {
+                emptyList()
+            }
+            mCachedHistoryDay = today
+        }
+        return mCachedHistory ?: emptyList()
     }
     override fun onResume() {
         super.onResume()
+        // An import may have changed history while the Settings screen was open.
+        mCachedHistory = null
 
         if (::mStreakDashboardCard.isInitialized) {
             updateStreakCards()

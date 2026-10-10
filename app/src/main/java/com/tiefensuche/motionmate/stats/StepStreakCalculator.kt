@@ -10,7 +10,9 @@ import java.util.TimeZone
 
 internal data class StreakResult(
     val current: Int,
-    val best: Int
+    val best: Int,
+    val bestStart: Long? = null,
+    val bestEnd: Long? = null
 )
 
 internal object StepStreakCalculator {
@@ -48,6 +50,14 @@ internal object StepStreakCalculator {
             return dayKey(date)
         }
 
+        fun startOfDay(key: String): Long {
+            val parts = key.split("-")
+            return Calendar.getInstance(timeZone).apply {
+                clear()
+                set(parts[0].toInt(), parts[1].toInt() - 1, parts[2].toInt())
+            }.timeInMillis
+        }
+
         val today = dayKey(calendar(now))
         val yesterday = previousDay(today)
 
@@ -69,9 +79,19 @@ internal object StepStreakCalculator {
         var best = 0
         var run = 0
         var previous: String? = null
+        var runStart: String? = null
+        var bestStart: String? = null
+        var bestEnd: String? = null
         for (day in completedDays.sorted()) {
-            run = if (previous != null && previousDay(day) == previous) run + 1 else 1
-            best = maxOf(best, run)
+            val continuous = previous != null && previousDay(day) == previous
+            if (!continuous) runStart = day
+            run = if (continuous) run + 1 else 1
+            // In a tie, show the most recent record interval.
+            if (run >= best) {
+                best = run
+                bestStart = runStart
+                bestEnd = day
+            }
             previous = day
         }
 
@@ -83,6 +103,11 @@ internal object StepStreakCalculator {
             cursor = previousDay(cursor)
         }
 
-        return StreakResult(current = current, best = best)
+        return StreakResult(
+            current = current,
+            best = best,
+            bestStart = bestStart?.let(::startOfDay),
+            bestEnd = bestEnd?.let(::startOfDay)
+        )
     }
 }

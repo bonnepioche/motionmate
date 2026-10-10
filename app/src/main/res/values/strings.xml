@@ -34,4 +34,8 @@
     <string name="streak_days">%1$d days</string>
     <string name="streak_best_summary">Best streak: %1$s</string>
     <string name="streak_goal_summary">Daily goal: %1$s steps</string>
+    <string name="streak_record_period">Record period: %1$s – %2$s</string>
+    <string name="rolling_averages_title">Average steps per day</string>
+    <string name="rolling_average_row">%1$d days: %2$s steps/day</string>
+    <string name="rolling_averages_caption">Completed days only; missing days count as zero.</string>
 </resources>
