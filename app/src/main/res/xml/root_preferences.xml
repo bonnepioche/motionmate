@@ -5,6 +5,17 @@
 <PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <PreferenceCategory app:title="@string/daily_step_goal">
+        <SeekBarPreference
+            app:key="daily_step_goal"
+            app:title="@string/daily_step_goal"
+            app:min="1000"
+            android:max="30000"
+            app:seekBarIncrement="500"
+            app:defaultValue="10000"
+            app:showSeekBarValue="true" />
+        </PreferenceCategory>
+
     <PreferenceCategory app:title="@string/step_width">
         <SeekBarPreference
             app:min="50"

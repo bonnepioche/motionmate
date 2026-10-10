@@ -28,4 +28,8 @@
     <string name="appearance">Appearance</string>
     <string name="theme">Theme</string>
     <string name="app_version">App version</string>
+    <string name="daily_step_goal">Daily step goal</string>
+    <string name="current_streak">Current streak</string>
+    <string name="best_streak">Best streak</string>
+    <string name="streak_days">%1$d days</string>
 </resources>

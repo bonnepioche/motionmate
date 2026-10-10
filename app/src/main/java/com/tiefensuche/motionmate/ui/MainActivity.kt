@@ -39,6 +39,8 @@ import com.tiefensuche.motionmate.util.Database
 import com.tiefensuche.motionmate.util.Util
 import java.util.*
 import kotlin.collections.ArrayList
+import com.tiefensuche.motionmate.stats.StepStreakCalculator
+import com.tiefensuche.motionmate.ui.cards.TextItem
 
 /**
  * The main activity for the UI of the step counter.
@@ -54,6 +56,8 @@ internal class MainActivity : AppCompatActivity() {
     private lateinit var mMonthlyStepsCard: MotionStatisticsTextItem
     private lateinit var mAverageStepsCard: MotionTextItem
     private lateinit var mOverallStepsCard: MotionStatisticsTextItem
+    private lateinit var mCurrentStreakCard: TextItem
+    private lateinit var mBestStreakCard: TextItem
     private var mCurrentSteps: Int = 0
     private var mSelectedMonth = Util.calendar
 
@@ -180,6 +184,14 @@ internal class MainActivity : AppCompatActivity() {
         mOverallStepsCard = MotionStatisticsTextItem(this, R.string.overall_distance, overallSteps)
         mAdapter.add(mOverallStepsCard)
 
+        mCurrentStreakCard = TextItem(this, R.string.current_streak)
+        mBestStreakCard = TextItem(this, R.string.best_streak)
+
+        mAdapter.add(mCurrentStreakCard)
+        mAdapter.add(mBestStreakCard)
+
+        updateStreakCards()
+
         updateCards()
     }
 
@@ -219,6 +231,9 @@ internal class MainActivity : AppCompatActivity() {
     private fun updateView(steps: Int, activities: MutableList<Bundle>) {
         // update current today's steps in the header
         mCurrentSteps = steps
+
+        updateStreakCards()
+
         mTextViewMeters.text = String.format(getString(R.string.meters_today), Util.stepsToMeters(steps))
         mTextViewSteps.text = resources.getQuantityString(R.plurals.steps_text, steps, steps)
 
@@ -324,5 +339,42 @@ internal class MainActivity : AppCompatActivity() {
     companion object {
 
         const val RECEIVER_TAG = "RECEIVER_TAG"
+    }
+    private fun updateStreakCards() {
+        val preferences = PreferenceManager.getDefaultSharedPreferences(this)
+        val goal = preferences.getInt("daily_step_goal", 10000)
+
+        val database = Database.getInstance(this)
+        val first = database.firstEntry
+        val last = database.lastEntry
+
+        val history = if (first != 0L) {
+            database.getEntries(first, last).map { entry ->
+                entry.timestamp to entry.steps
+            }
+        } else {
+            emptyList()
+        }
+
+        val result = StepStreakCalculator.calculate(
+            history = history,
+            todaySteps = mCurrentSteps,
+            goal = goal
+        )
+
+        mCurrentStreakCard.setContent(
+            getString(R.string.streak_days, result.current)
+        )
+        mBestStreakCard.setContent(
+            getString(R.string.streak_days, result.best)
+        )
+    }
+    override fun onResume() {
+        super.onResume()
+
+        if (::mCurrentStreakCard.isInitialized &&
+            ::mBestStreakCard.isInitialized) {
+            updateStreakCards()
+            }
     }
 }
