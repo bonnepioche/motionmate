@@ -3,4 +3,14 @@
     <string name="progress_icon_title">Icône de progression</string>
     <string name="goal_progress_description">Objectif quotidien atteint à %1$d pour cent</string>
     <string name="today_label">Aujourd’hui</string>
+    <!-- Tableau hebdomadaire équilibre (dev.11) -->
+    <string name="week_goal_line">Objectif : %1$s pas/jour</string>
+    <string name="week_total_label">Total semaine</string>
+    <string name="week_average_label">Moyenne / jour</string>
+    <string name="week_goal_days_label">Objectif atteint</string>
+    <string name="week_goal_days_value">%1$d / %2$d jours</string>
+    <string name="week_average_current_hint">Moyenne sur les jours écoulés, aujourd’hui inclus</string>
+    <string name="week_average_past_hint">Moyenne sur 7 jours calendaires</string>
+    <string name="week_average_future_hint">Aucun jour écoulé</string>
+    <string name="week_accessibility">Semaine : %1$s pas au total, %2$s pas de moyenne par jour, objectif atteint %3$d jours sur %4$d écoulés</string>
 </resources>

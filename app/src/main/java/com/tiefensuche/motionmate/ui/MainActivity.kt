@@ -40,6 +40,7 @@ import java.util.*
 import kotlin.collections.ArrayList
 import com.tiefensuche.motionmate.stats.StepStreakCalculator
 import com.tiefensuche.motionmate.stats.RollingStepAverages
+import com.tiefensuche.motionmate.stats.WeeklyStepSummary
 import com.tiefensuche.motionmate.ui.cards.TextItem
 import com.tiefensuche.motionmate.ui.cards.StreakDashboardItem
 import com.tiefensuche.motionmate.ui.cards.RollingStepAveragesItem
@@ -303,10 +304,16 @@ internal class MainActivity : AppCompatActivity() {
             mAdapter.addTop(item)
         }
 
-        // If selected week is the current week, update the diagram and cards with today's steps
-        if (mSelectedMonth.get(Calendar.WEEK_OF_YEAR) == Calendar.getInstance().get(Calendar.WEEK_OF_YEAR)) {
-            mChart.setCurrentSteps(steps)
-            mChart.update()
+        // Refresh the selected week only when it includes today (even across a year boundary).
+        val now = System.currentTimeMillis()
+        val selectedWeek = WeeklyStepSummary.calculate(
+            history = emptyList(), selectedDate = mSelectedMonth.timeInMillis,
+            todaySteps = steps.coerceAtLeast(0), goal = 1, now = now
+        )
+        if (selectedWeek.todayIndex >= 0) updateChart()
+        val currentCalendar = Calendar.getInstance()
+        if (mSelectedMonth.get(Calendar.YEAR) == currentCalendar.get(Calendar.YEAR) &&
+            mSelectedMonth.get(Calendar.MONTH) == currentCalendar.get(Calendar.MONTH)) {
             mMonthlyStepsCard.updateSteps(steps)
         }
     }
@@ -325,42 +332,69 @@ internal class MainActivity : AppCompatActivity() {
     }
 
     private fun updateChart() {
-        val min = Calendar.getInstance()
-        min.timeInMillis = mSelectedMonth.timeInMillis
+        val selected = Calendar.getInstance().apply {
+            timeInMillis = mSelectedMonth.timeInMillis
+        }
+        val goal = PreferenceManager.getDefaultSharedPreferences(this)
+            .getInt("daily_step_goal", 10000).coerceAtLeast(1)
+        val history = getCachedHistory()
+        val week = WeeklyStepSummary.calculate(
+            history = history,
+            selectedDate = selected.timeInMillis,
+            todaySteps = mCurrentSteps.coerceAtLeast(0),
+            goal = goal
+        )
+        val weekStart = Calendar.getInstance().apply { timeInMillis = week.weekStart }
+        val weekEnd = Calendar.getInstance().apply {
+            timeInMillis = week.weekEndExclusive
+            add(Calendar.DAY_OF_MONTH, -1)
+        }
+        mTextViewChart.text = String.format(
+            Locale.getDefault(), getString(R.string.week_display_format),
+            weekStart.get(Calendar.WEEK_OF_YEAR), weekStart.timeInMillis, weekEnd.timeInMillis
+        )
+        val formatter = NumberFormat.getIntegerInstance()
+        findViewById<TextView>(R.id.textViewWeekGoal).text =
+            getString(R.string.week_goal_line, formatter.format(goal))
+        findViewById<TextView>(R.id.textViewWeekTotal).text = formatter.format(week.total)
+        findViewById<TextView>(R.id.textViewWeekAverage).text =
+            formatter.format(week.averagePerElapsedDay)
+        findViewById<TextView>(R.id.textViewWeekAchieved).text =
+            getString(R.string.week_goal_days_value, week.achievedDays, week.elapsedDays)
+        findViewById<TextView>(R.id.textViewWeekHint).setText(when {
+            week.todayIndex >= 0 -> R.string.week_average_current_hint
+            week.elapsedDays == 7 -> R.string.week_average_past_hint
+            else -> R.string.week_average_future_hint
+        })
+        mChart.setWeek(week)
 
-        // Jump to the first day of the week
-        min.set(Calendar.DAY_OF_WEEK, Calendar.getInstance().firstDayOfWeek)
-
-        val max = Calendar.getInstance()
-        max.timeInMillis = min.timeInMillis
-
-        // Jump to the last day of the week
-        max.add(Calendar.DAY_OF_YEAR, 6)
-
-        mChart.clearDiagram()
-        mTextViewChart.text = String.format(Locale.getDefault(), getString(R.string.week_display_format), min.get(Calendar.WEEK_OF_YEAR), min.timeInMillis, max.timeInMillis)
-
-        // Get the records of the selected week between the min and max timestamps
-        val entries = Database.getInstance(this).getEntries(min.timeInMillis, max.timeInMillis)
-
-        mTextViewCalendarContent.text = String.format(getString(R.string.no_entry), mSelectedMonth.timeInMillis)
-        for (entry in entries) {
-            mChart.setDiagramEntry(entry)
-
-            val cal = Calendar.getInstance()
-            cal.timeInMillis = entry.timestamp
-
-            // Update the description text with the selected date
-            if (cal.get(Calendar.DAY_OF_WEEK) == mSelectedMonth.get(Calendar.DAY_OF_WEEK)) {
-                mTextViewCalendarContent.text = String.format(Locale.getDefault(), getString(R.string.steps_day_display), cal.timeInMillis, Util.stepsToMeters(entry.steps), entry.steps)
+        // Selected-day details still follow the History calendar; don't count rows twice.
+        val selectedDay = Calendar.getInstance().apply {
+            timeInMillis = selected.timeInMillis
+            set(Calendar.HOUR_OF_DAY, 0)
+            set(Calendar.MINUTE, 0)
+            set(Calendar.SECOND, 0)
+            set(Calendar.MILLISECOND, 0)
+        }
+        val selectedIndex = (0..6).indexOfFirst { index ->
+            val day = Calendar.getInstance().apply {
+                timeInMillis = week.weekStart
+                add(Calendar.DAY_OF_MONTH, index)
             }
+            day.timeInMillis == selectedDay.timeInMillis
         }
-
-        // If selected week is the current week, update the diagram with today's steps
-        if (mSelectedMonth.get(Calendar.WEEK_OF_YEAR) == Calendar.getInstance().get(Calendar.WEEK_OF_YEAR)) {
-            mChart.setCurrentSteps(mCurrentSteps)
+        val steps = if (selectedIndex >= 0) week.days[selectedIndex] else 0L
+        val liveToday = DateUtils.isToday(selectedDay.timeInMillis)
+        if (selectedIndex >= 0 && (steps > 0L || liveToday)) {
+            mTextViewCalendarContent.text = String.format(
+                Locale.getDefault(), getString(R.string.steps_day_display),
+                selectedDay.timeInMillis, Util.stepsToMeters(steps), steps
+            )
+        } else {
+            mTextViewCalendarContent.text = String.format(
+                Locale.getDefault(), getString(R.string.no_entry), selectedDay.timeInMillis
+            )
         }
-        mChart.update()
     }
 
     private fun updateCards() {
@@ -444,6 +478,8 @@ internal class MainActivity : AppCompatActivity() {
         super.onResume()
         // An import may have changed history while the Settings screen was open.
         mCachedHistory = null
+        // An import from Settings may have changed the week.
+        if (::mChart.isInitialized) updateChart()
 
         if (::mGoalProgress.isInitialized) updateDailyGoalProgress(mCurrentSteps)
         if (::mStreakDashboardCard.isInitialized) {

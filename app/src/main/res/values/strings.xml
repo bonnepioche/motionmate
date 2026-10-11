@@ -46,4 +46,14 @@
     <string name="rolling_average_row">%1$d days: %2$s steps/day</string>
     <string name="rolling_averages_caption">Completed days only; missing days count as zero.</string>
     <string name="today_label">Today</string>
+    <!-- Balanced weekly chart (dev.11) -->
+    <string name="week_goal_line">Daily goal: %1$s steps</string>
+    <string name="week_total_label">Week total</string>
+    <string name="week_average_label">Average / day</string>
+    <string name="week_goal_days_label">Goal met</string>
+    <string name="week_goal_days_value">%1$d / %2$d days</string>
+    <string name="week_average_current_hint">Average over elapsed days, including today</string>
+    <string name="week_average_past_hint">Average over 7 calendar days</string>
+    <string name="week_average_future_hint">No elapsed days yet</string>
+    <string name="week_accessibility">Week: %1$s steps total, %2$s steps average per day, goal met on %3$d of %4$d elapsed days</string>
 </resources>
