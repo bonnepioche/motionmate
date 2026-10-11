@@ -56,4 +56,34 @@
     <string name="week_average_past_hint">Average over 7 calendar days</string>
     <string name="week_average_future_hint">No elapsed days yet</string>
     <string name="week_accessibility">Week: %1$s steps total, %2$s steps average per day, goal met on %3$d of %4$d elapsed days</string>
+    <!-- History visual dashboard (dev.12) -->
+    <string name="history_previous_day">Previous day</string>
+    <string name="history_next_day">Next day</string>
+    <string name="history_previous_month">Previous month</string>
+    <string name="history_next_month">Next month</string>
+    <string name="history_goal_met">Goal reached</string>
+    <string name="history_goal_missed">Below goal</string>
+    <string name="history_no_data">No data</string>
+    <string name="history_in_progress">In progress</string>
+    <string name="history_today_status">Today · %1$s</string>
+    <string name="history_steps_value">%1$s steps</string>
+    <string name="history_goal_percent">%1$d%%</string>
+    <string name="history_distance_value">≈ %1$.2f km</string>
+    <string name="history_walking_icon">Walking</string>
+    <!-- Two-line stats cards only; do not change the foreground notification format. -->
+    <string name="steps_card_format">%1$.2f km\n%2$,d steps</string>
+    <!-- History polish dev.12.2: hollow gray dots are elapsed days with no data. -->
+    <string name="history_calendar_no_data">No data (past)</string>
+    <string name="steps_month_card_format">%1$,d steps\n≈ %2$.2f km</string>
+    <!-- DEV 12.3: compact combined statistics and five rolling average tiles. -->
+    <string name="global_stats_title">Overall statistics</string>
+    <string name="global_stats_value">%1$s steps · ≈ %2$.2f km</string>
+    <string name="global_stats_accessibility">This month: %1$s; Daily average: %2$s; Total: %3$s</string>
+    <string name="rolling_7_days">7 days</string>
+    <string name="rolling_30_days">30 days</string>
+    <string name="rolling_90_days">90 days</string>
+    <string name="rolling_180_days">180 days</string>
+    <string name="rolling_365_days">365 days</string>
+    <string name="rolling_per_day_unit">steps/day</string>
+    <string name="dashboard_card_style_title">Dashboard card style</string>
 </resources>

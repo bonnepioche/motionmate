@@ -3,39 +3,147 @@
 <com.google.android.material.card.MaterialCardView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_width="match_parent" android:layout_height="wrap_content"
     android:layout_margin="3dp"
-    app:cardCornerRadius="16dp"
-    app:cardBackgroundColor="@color/bronze_surface"
-    app:strokeColor="@color/bronze_outline"
-    app:strokeWidth="1dp"
-    app:contentPadding="16dp">
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
-        <TextView
-            android:id="@+id/textViewDescription"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textColor="@color/bronze_primary"
-            android:textStyle="bold"
-            android:textSize="17sp" />
-        <TextView
-            android:id="@+id/textViewContent"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:lineSpacingExtra="5dp"
-            android:textColor="@color/bronze_on_surface"
-            android:textSize="17sp" />
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:text="@string/rolling_averages_caption"
-            android:textColor="@color/bronze_on_surface_variant"
-            android:textSize="12sp" />
+    app:cardCornerRadius="16dp" app:cardBackgroundColor="@color/bronze_surface"
+    app:strokeColor="@color/bronze_outline" app:strokeWidth="1dp"
+    app:contentPadding="0dp">
+  <LinearLayout android:id="@+id/rollingGradientSurface"
+      android:layout_width="match_parent" android:layout_height="wrap_content"
+      android:orientation="vertical" android:padding="12dp">
+    <TextView android:id="@+id/textViewDescription"
+        android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:layout_marginBottom="7dp" android:textColor="@color/bronze_primary"
+        android:textStyle="bold" android:textSize="18sp" />
+    <!-- Adapter data binding is driven by this hidden live-content view. -->
+    <TextView android:id="@+id/textViewContent"
+        android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:visibility="gone" />
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:orientation="horizontal" android:layout_marginTop="3dp" android:weightSum="3">
+      <com.google.android.material.card.MaterialCardView
+          android:layout_width="0dp" android:layout_weight="1"
+          android:layout_height="wrap_content" android:layout_margin="3dp"
+          app:cardCornerRadius="12dp" app:cardBackgroundColor="@color/bronze_surface_variant"
+          app:strokeColor="@color/bronze_outline" app:strokeWidth="1dp">
+        <LinearLayout android:id="@+id/rolling7GradientSurface" android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:orientation="vertical" android:padding="9dp">
+          <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+              android:text="@string/rolling_7_days" android:textColor="@color/bronze_primary"
+              android:textSize="12sp" android:maxLines="1" />
+          <TextView android:id="@+id/rollingAvg7" android:layout_width="match_parent"
+              android:layout_height="wrap_content" android:layout_marginTop="4dp"
+              android:textColor="@color/bronze_on_surface" android:textStyle="bold"
+              android:textSize="19sp" android:autoSizeTextType="uniform"
+              android:autoSizeMinTextSize="13sp" android:autoSizeMaxTextSize="19sp"
+              android:autoSizeStepGranularity="1sp" android:maxLines="1"
+              android:text="—" />
+          <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+              android:text="@string/rolling_per_day_unit"
+              android:textColor="@color/bronze_on_surface_variant" android:textSize="11sp"
+              android:maxLines="1" />
+        </LinearLayout>
+      </com.google.android.material.card.MaterialCardView>
+      <com.google.android.material.card.MaterialCardView
+          android:layout_width="0dp" android:layout_weight="1"
+          android:layout_height="wrap_content" android:layout_margin="3dp"
+          app:cardCornerRadius="12dp" app:cardBackgroundColor="@color/bronze_surface_variant"
+          app:strokeColor="@color/bronze_outline" app:strokeWidth="1dp">
+        <LinearLayout android:id="@+id/rolling30GradientSurface" android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:orientation="vertical" android:padding="9dp">
+          <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+              android:text="@string/rolling_30_days" android:textColor="@color/bronze_primary"
+              android:textSize="12sp" android:maxLines="1" />
+          <TextView android:id="@+id/rollingAvg30" android:layout_width="match_parent"
+              android:layout_height="wrap_content" android:layout_marginTop="4dp"
+              android:textColor="@color/bronze_on_surface" android:textStyle="bold"
+              android:textSize="19sp" android:autoSizeTextType="uniform"
+              android:autoSizeMinTextSize="13sp" android:autoSizeMaxTextSize="19sp"
+              android:autoSizeStepGranularity="1sp" android:maxLines="1"
+              android:text="—" />
+          <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+              android:text="@string/rolling_per_day_unit"
+              android:textColor="@color/bronze_on_surface_variant" android:textSize="11sp"
+              android:maxLines="1" />
+        </LinearLayout>
+      </com.google.android.material.card.MaterialCardView>
+      <com.google.android.material.card.MaterialCardView
+          android:layout_width="0dp" android:layout_weight="1"
+          android:layout_height="wrap_content" android:layout_margin="3dp"
+          app:cardCornerRadius="12dp" app:cardBackgroundColor="@color/bronze_surface_variant"
+          app:strokeColor="@color/bronze_outline" app:strokeWidth="1dp">
+        <LinearLayout android:id="@+id/rolling90GradientSurface" android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:orientation="vertical" android:padding="9dp">
+          <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+              android:text="@string/rolling_90_days" android:textColor="@color/bronze_primary"
+              android:textSize="12sp" android:maxLines="1" />
+          <TextView android:id="@+id/rollingAvg90" android:layout_width="match_parent"
+              android:layout_height="wrap_content" android:layout_marginTop="4dp"
+              android:textColor="@color/bronze_on_surface" android:textStyle="bold"
+              android:textSize="19sp" android:autoSizeTextType="uniform"
+              android:autoSizeMinTextSize="13sp" android:autoSizeMaxTextSize="19sp"
+              android:autoSizeStepGranularity="1sp" android:maxLines="1"
+              android:text="—" />
+          <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+              android:text="@string/rolling_per_day_unit"
+              android:textColor="@color/bronze_on_surface_variant" android:textSize="11sp"
+              android:maxLines="1" />
+        </LinearLayout>
+      </com.google.android.material.card.MaterialCardView>
     </LinearLayout>
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:orientation="horizontal" android:layout_marginTop="3dp" android:weightSum="2">
+      <com.google.android.material.card.MaterialCardView
+          android:layout_width="0dp" android:layout_weight="1"
+          android:layout_height="wrap_content" android:layout_margin="3dp"
+          app:cardCornerRadius="12dp" app:cardBackgroundColor="@color/bronze_surface_variant"
+          app:strokeColor="@color/bronze_outline" app:strokeWidth="1dp">
+        <LinearLayout android:id="@+id/rolling180GradientSurface" android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:orientation="vertical" android:padding="9dp">
+          <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+              android:text="@string/rolling_180_days" android:textColor="@color/bronze_primary"
+              android:textSize="12sp" android:maxLines="1" />
+          <TextView android:id="@+id/rollingAvg180" android:layout_width="match_parent"
+              android:layout_height="wrap_content" android:layout_marginTop="4dp"
+              android:textColor="@color/bronze_on_surface" android:textStyle="bold"
+              android:textSize="19sp" android:autoSizeTextType="uniform"
+              android:autoSizeMinTextSize="13sp" android:autoSizeMaxTextSize="19sp"
+              android:autoSizeStepGranularity="1sp" android:maxLines="1"
+              android:text="—" />
+          <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+              android:text="@string/rolling_per_day_unit"
+              android:textColor="@color/bronze_on_surface_variant" android:textSize="11sp"
+              android:maxLines="1" />
+        </LinearLayout>
+      </com.google.android.material.card.MaterialCardView>
+      <com.google.android.material.card.MaterialCardView
+          android:layout_width="0dp" android:layout_weight="1"
+          android:layout_height="wrap_content" android:layout_margin="3dp"
+          app:cardCornerRadius="12dp" app:cardBackgroundColor="@color/bronze_surface_variant"
+          app:strokeColor="@color/bronze_outline" app:strokeWidth="1dp">
+        <LinearLayout android:id="@+id/rolling365GradientSurface" android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:orientation="vertical" android:padding="9dp">
+          <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+              android:text="@string/rolling_365_days" android:textColor="@color/bronze_primary"
+              android:textSize="12sp" android:maxLines="1" />
+          <TextView android:id="@+id/rollingAvg365" android:layout_width="match_parent"
+              android:layout_height="wrap_content" android:layout_marginTop="4dp"
+              android:textColor="@color/bronze_on_surface" android:textStyle="bold"
+              android:textSize="19sp" android:autoSizeTextType="uniform"
+              android:autoSizeMinTextSize="13sp" android:autoSizeMaxTextSize="19sp"
+              android:autoSizeStepGranularity="1sp" android:maxLines="1"
+              android:text="—" />
+          <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+              android:text="@string/rolling_per_day_unit"
+              android:textColor="@color/bronze_on_surface_variant" android:textSize="11sp"
+              android:maxLines="1" />
+        </LinearLayout>
+      </com.google.android.material.card.MaterialCardView>
+    </LinearLayout>
+    <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:layout_marginTop="7dp" android:paddingStart="4dp"
+        android:text="@string/rolling_averages_caption"
+        android:textColor="@color/bronze_on_surface_variant"
+        android:textSize="11sp" />
+  </LinearLayout>
 </com.google.android.material.card.MaterialCardView>

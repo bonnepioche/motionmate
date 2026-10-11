@@ -52,4 +52,13 @@
         <item>Daily energy and motivation.</item>
         <item>An achievement star.</item>
     </string-array>
+    <!-- Card background styling only: calculations are unaffected. -->
+    <string-array name="dashboard_card_style_entries">
+        <item>Standard bronze</item>
+        <item>Bronze gradient (mockup)</item>
+    </string-array>
+    <string-array name="dashboard_card_style_values">
+        <item>standard</item>
+        <item>gradient</item>
+    </string-array>
 </resources>

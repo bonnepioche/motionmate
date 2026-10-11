@@ -10,8 +10,8 @@
     app:cardBackgroundColor="@color/bronze_surface"
     app:strokeColor="@color/bronze_primary"
     app:strokeWidth="2dp"
-    app:contentPadding="12dp">
-    <LinearLayout
+    app:contentPadding="0dp">
+    <LinearLayout android:id="@+id/streakGradientSurface" android:padding="12dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">

@@ -16,8 +16,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="end|bottom"
-        android:src="@android:drawable/ic_media_play"
-        android:layout_margin="16dp"
+        android:src="@drawable/ic_add_activity_bronze"
+        android:contentDescription="@string/new_activity"
+        android:layout_margin="10dp"
+        app:fabSize="mini"
         app:backgroundTint="@color/bronze_primary"
         app:tint="@color/bronze_on_primary" />
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

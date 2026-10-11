@@ -22,4 +22,15 @@
     <color name="streak_bronze">#92643D</color>
     <color name="streak_bronze_background">#F5ECE2</color>
     <color name="streak_bronze_border">#BB9777</color>
+    <!-- History calendar semantics: independent of selected copper day. -->
+    <color name="history_goal_met">#438854</color>
+    <color name="history_goal_missed">#AE6B3B</color>
+    <color name="history_no_data">#A49A91</color>
+    <!-- DEV 12.4: copper-lit gradient, selectable in Settings. -->
+    <color name="dashboard_gradient_outer_start">#FFFCF7</color>
+    <color name="dashboard_gradient_outer_mid">#F7E9DA</color>
+    <color name="dashboard_gradient_outer_end">#EAD5BF</color>
+    <color name="dashboard_gradient_tile_start">#FFEBD7</color>
+    <color name="dashboard_gradient_tile_mid">#F4D8BF</color>
+    <color name="dashboard_gradient_tile_end">#E7BE99</color>
 </resources>

@@ -12,8 +12,8 @@
     app:cardBackgroundColor="@color/bronze_surface"
     app:strokeColor="@color/bronze_outline"
     app:strokeWidth="1dp"
-    app:contentPadding="14dp">
-    <LinearLayout
+    app:contentPadding="0dp">
+    <LinearLayout android:id="@+id/genericGradientSurface" android:padding="14dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
@@ -33,8 +33,10 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:textColor="@color/bronze_on_surface"
-                android:textSize="24sp"
-                android:textAlignment="center" />
+                android:textSize="21sp"
+                android:maxLines="3"
+                android:paddingEnd="52dp"
+                android:textAlignment="viewStart" />
             <ImageButton
                 android:id="@+id/imageButton"
                 android:layout_width="wrap_content"

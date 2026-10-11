@@ -34,6 +34,13 @@
             app:title="@string/theme"
             app:useSimpleSummaryProvider="true" />
         <ListPreference
+            app:key="dashboard_card_style"
+            app:title="@string/dashboard_card_style_title"
+            app:entries="@array/dashboard_card_style_entries"
+            app:entryValues="@array/dashboard_card_style_values"
+            app:defaultValue="standard"
+            app:useSimpleSummaryProvider="true" />
+        <ListPreference
             app:key="streak_card_style"
             app:title="@string/streak_card_style_title"
             app:entries="@array/streak_card_style_entries"

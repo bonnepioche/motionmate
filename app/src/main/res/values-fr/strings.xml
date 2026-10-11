@@ -13,4 +13,43 @@
     <string name="week_average_past_hint">Moyenne sur 7 jours calendaires</string>
     <string name="week_average_future_hint">Aucun jour écoulé</string>
     <string name="week_accessibility">Semaine : %1$s pas au total, %2$s pas de moyenne par jour, objectif atteint %3$d jours sur %4$d écoulés</string>
+    <!-- Historique visuel (dev.12) -->
+    <string name="history_previous_day">Jour précédent</string>
+    <string name="history_next_day">Jour suivant</string>
+    <string name="history_previous_month">Mois précédent</string>
+    <string name="history_next_month">Mois suivant</string>
+    <string name="history_goal_met">Objectif atteint</string>
+    <string name="history_goal_missed">Sous l’objectif</string>
+    <string name="history_no_data">Sans données</string>
+    <string name="history_in_progress">En cours</string>
+    <string name="history_today_status">Aujourd’hui · %1$s</string>
+    <string name="history_steps_value">%1$s pas</string>
+    <string name="history_goal_percent">%1$d%%</string>
+    <string name="history_distance_value">≈ %1$.2f km</string>
+    <string name="history_walking_icon">Marche</string>
+    <!-- Dashboard polish (dev.12.1) -->
+    <string name="history">Historique</string>
+    <string name="history_show_calendar">Voir le calendrier ▾</string>
+    <string name="history_hide_calendar">Masquer le calendrier ▴</string>
+    <string name="steps_month">Pas ce mois-ci</string>
+    <string name="avg_distance">Distance moyenne par jour</string>
+    <string name="overall_distance">Distance totale</string>
+    <string name="steps_card_format">%1$.2f km\n%2$,d pas</string>
+    <!-- Finitions Historique dev.12.2 -->
+    <string name="history_calendar_no_data">Sans données (passé)</string>
+    <string name="steps_month_card_format">%1$,d pas\n≈ %2$.2f km</string>
+    <!-- DEV 12.3 : statistiques regroupées et moyennes en sous-cartes. -->
+    <string name="global_stats_title">Statistiques globales</string>
+    <string name="global_stats_value">%1$s pas · ≈ %2$.2f km</string>
+    <string name="global_stats_accessibility">Ce mois : %1$s ; Moyenne quotidienne : %2$s ; Total : %3$s</string>
+    <string name="rolling_averages_title">Moyenne de pas par jour</string>
+    <string name="rolling_averages_caption">Jours terminés uniquement ; les jours sans données comptent pour zéro.</string>
+    <string name="rolling_average_row">%1$d jours : %2$s pas/jour</string>
+    <string name="rolling_7_days">7 jours</string>
+    <string name="rolling_30_days">30 jours</string>
+    <string name="rolling_90_days">90 jours</string>
+    <string name="rolling_180_days">180 jours</string>
+    <string name="rolling_365_days">365 jours</string>
+    <string name="rolling_per_day_unit">pas/jour</string>
+    <string name="dashboard_card_style_title">Style des cartes du tableau de bord</string>
 </resources>

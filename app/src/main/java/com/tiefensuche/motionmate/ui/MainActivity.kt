@@ -19,7 +19,6 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.ItemTouchHelper
 import android.view.View
 import android.view.ViewGroup
-import android.widget.CalendarView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.app.ActivityCompat
@@ -32,8 +31,7 @@ import androidx.preference.PreferenceManager
 import com.tiefensuche.motionmate.R
 import com.tiefensuche.motionmate.service.MotionService
 import com.tiefensuche.motionmate.ui.cards.MotionActivityTextItem
-import com.tiefensuche.motionmate.ui.cards.MotionStatisticsTextItem
-import com.tiefensuche.motionmate.ui.cards.MotionTextItem
+import com.tiefensuche.motionmate.ui.cards.GlobalStatsItem
 import com.tiefensuche.motionmate.util.Database
 import com.tiefensuche.motionmate.util.Util
 import java.util.*
@@ -41,11 +39,13 @@ import kotlin.collections.ArrayList
 import com.tiefensuche.motionmate.stats.StepStreakCalculator
 import com.tiefensuche.motionmate.stats.RollingStepAverages
 import com.tiefensuche.motionmate.stats.WeeklyStepSummary
+import com.tiefensuche.motionmate.stats.DailyHistorySummary
 import com.tiefensuche.motionmate.ui.cards.TextItem
 import com.tiefensuche.motionmate.ui.cards.StreakDashboardItem
 import com.tiefensuche.motionmate.ui.cards.RollingStepAveragesItem
 import com.tiefensuche.motionmate.stats.DailyGoalProgress
 import java.text.NumberFormat
+import java.text.SimpleDateFormat
 
 /**
  * The main activity for the UI of the step counter.
@@ -55,8 +55,8 @@ internal class MainActivity : AppCompatActivity() {
     private lateinit var mTextViewMeters: TextView
     private lateinit var mTextViewGoalProgress: TextView
     private lateinit var mGoalProgress: GoalProgressView
-    private lateinit var mTextViewCalendarContent: TextView
-    private lateinit var mCalendarView: CalendarView
+    private lateinit var mHistoryCalendar: HistoryCalendarView
+    private lateinit var mHistoryGoalBar: HistoryGoalBarView
     private lateinit var mCalendarContainer: View
     private lateinit var mCalendarToggle: TextView
     private var mHistoryExpanded = false
@@ -65,13 +65,14 @@ internal class MainActivity : AppCompatActivity() {
     private var mAdapter: TextItemAdapter = TextItemAdapter()
     // Dedicated one-card list positioned between daily steps and History.
     private val mStreakAdapter = TextItemAdapter()
-    private lateinit var mMonthlyStepsCard: MotionStatisticsTextItem
-    private lateinit var mAverageStepsCard: MotionTextItem
-    private lateinit var mOverallStepsCard: MotionStatisticsTextItem
+    private lateinit var mGlobalStatsCard: GlobalStatsItem
     private lateinit var mStreakDashboardCard: StreakDashboardItem
     private lateinit var mRollingAveragesCard: RollingStepAveragesItem
     private var mCachedHistory: List<Pair<Long, Int>>? = null
     private var mCachedHistoryDay: Long = Long.MIN_VALUE
+    private var mDailyHistory: Map<Long, Long>? = null
+    private var mCalendarNeedsRefresh = true
+    private var mLastToday = DailyHistorySummary.startOfDay(System.currentTimeMillis())
     private var mCurrentSteps: Int = 0
     private var mSelectedMonth = Util.calendar
 
@@ -89,34 +90,25 @@ internal class MainActivity : AppCompatActivity() {
         mTextViewGoalProgress = findViewById(R.id.textViewGoalProgress)
         mGoalProgress = findViewById(R.id.goalProgress)
         val mRecyclerView = findViewById<RecyclerView>(R.id.recyclerView)
-        mTextViewCalendarContent = findViewById(R.id.textViewCalendarContent)
+        mHistoryCalendar = findViewById(R.id.historyCalendar)
+        mHistoryGoalBar = findViewById(R.id.historyGoalProgress)
         mChart = findViewById(R.id.chart)
         mTextViewChart = findViewById(R.id.textViewChart)
-        mCalendarView = findViewById(R.id.calendar)
         mCalendarContainer = findViewById(R.id.calendarContainer)
         mCalendarToggle = findViewById(R.id.textViewCalendarToggle)
-        // Compact History by default; preserve the expanded state on rotation.
+        // Restore the selected date as well as the collapsed calendar on rotation.
+        mSelectedMonth.timeInMillis = savedInstanceState?.getLong(
+            HISTORY_SELECTED_DAY_KEY, Util.calendar.timeInMillis
+        ) ?: Util.calendar.timeInMillis
         mHistoryExpanded = savedInstanceState?.getBoolean(HISTORY_EXPANDED_KEY) ?: false
         mCalendarToggle.setOnClickListener {
             mHistoryExpanded = !mHistoryExpanded
             updateHistoryVisibility()
         }
+        mHistoryCalendar.onDaySelected = { day -> selectHistoryDay(day) }
+        findViewById<TextView>(R.id.historyPreviousDay).setOnClickListener { moveHistoryDay(-1) }
+        findViewById<TextView>(R.id.historyNextDay).setOnClickListener { moveHistoryDay(1) }
         updateHistoryVisibility()
-        mCalendarView.minDate = Database.getInstance(this).firstEntry.let {
-            if (it == 0L)
-                Util.calendar.timeInMillis
-            else
-                it
-        }
-        mCalendarView.maxDate = Util.calendar.timeInMillis
-        mCalendarView.setOnDateChangeListener { _, year, month, dayOfMonth ->
-            mSelectedMonth.set(Calendar.YEAR, year)
-            mSelectedMonth.set(Calendar.MONTH, month)
-            mSelectedMonth.set(Calendar.DAY_OF_MONTH, dayOfMonth)
-
-            updateChart()
-            updateCards()
-        }
 
         val mLayoutManager = LinearLayoutManager(this)
         mRecyclerView.layoutManager = mLayoutManager
@@ -203,18 +195,9 @@ internal class MainActivity : AppCompatActivity() {
     }
 
     private fun setupCards() {
-        // A card that displays sum of steps in the current month
-        mMonthlyStepsCard = MotionStatisticsTextItem(this, R.string.steps_month, 0)
-        mAdapter.add(mMonthlyStepsCard)
-
-        // A card that displays average distance in a day
-        mAverageStepsCard = MotionTextItem(this, R.string.avg_distance)
-        mAdapter.add(mAverageStepsCard)
-
-        // A card that displays overall sum of steps
-        val overallSteps = Database.getInstance(this).getSumSteps(Database.getInstance(this).firstEntry, Database.getInstance(this).lastEntry)
-        mOverallStepsCard = MotionStatisticsTextItem(this, R.string.overall_distance, overallSteps)
-        mAdapter.add(mOverallStepsCard)
+        // One compact group replaces the three separate statistics cards.
+        mGlobalStatsCard = GlobalStatsItem(this)
+        mAdapter.add(mGlobalStatsCard)
 
         mStreakDashboardCard = StreakDashboardItem(this)
         mStreakDashboardCard.displayStyle = PreferenceManager.getDefaultSharedPreferences(this)
@@ -271,12 +254,20 @@ internal class MainActivity : AppCompatActivity() {
         mTextViewMeters.text = String.format(getString(R.string.meters_today), Util.stepsToMeters(steps))
         mTextViewSteps.text = resources.getQuantityString(R.plurals.steps_text, steps, steps)
 
-        // update calendar max date for the case that new day started
-        if (!DateUtils.isToday(mCalendarView.maxDate))
-            mCalendarView.maxDate = Util.calendar.timeInMillis
+        // Midnight rollover: follow today only if the user was viewing yesterday.
+        val newToday = DailyHistorySummary.startOfDay(System.currentTimeMillis())
+        if (newToday != mLastToday) {
+            if (DailyHistorySummary.startOfDay(mSelectedMonth.timeInMillis) == mLastToday)
+                mSelectedMonth.timeInMillis = newToday
+            mLastToday = newToday
+            mCachedHistory = null
+            mDailyHistory = null
+            mCalendarNeedsRefresh = true
+            updateChart()
+        }
 
         // update the cards
-        mOverallStepsCard.updateSteps(steps)
+        mGlobalStatsCard.updateToday(steps)
         for (i in 0 until mAdapter.itemCount) {
             val item = mAdapter[i]
             if (item is MotionActivityTextItem) {
@@ -311,10 +302,11 @@ internal class MainActivity : AppCompatActivity() {
             todaySteps = steps.coerceAtLeast(0), goal = 1, now = now
         )
         if (selectedWeek.todayIndex >= 0) updateChart()
+        mHistoryCalendar.updateTodaySteps(steps.coerceAtLeast(0))
         val currentCalendar = Calendar.getInstance()
         if (mSelectedMonth.get(Calendar.YEAR) == currentCalendar.get(Calendar.YEAR) &&
             mSelectedMonth.get(Calendar.MONTH) == currentCalendar.get(Calendar.MONTH)) {
-            mMonthlyStepsCard.updateSteps(steps)
+            // Global statistics were already refreshed above.
         }
     }
 
@@ -328,6 +320,7 @@ internal class MainActivity : AppCompatActivity() {
 
     override fun onSaveInstanceState(outState: Bundle) {
         outState.putBoolean(HISTORY_EXPANDED_KEY, mHistoryExpanded)
+        outState.putLong(HISTORY_SELECTED_DAY_KEY, mSelectedMonth.timeInMillis)
         super.onSaveInstanceState(outState)
     }
 
@@ -368,32 +361,77 @@ internal class MainActivity : AppCompatActivity() {
         })
         mChart.setWeek(week)
 
-        // Selected-day details still follow the History calendar; don't count rows twice.
-        val selectedDay = Calendar.getInstance().apply {
-            timeInMillis = selected.timeInMillis
-            set(Calendar.HOUR_OF_DAY, 0)
-            set(Calendar.MINUTE, 0)
-            set(Calendar.SECOND, 0)
-            set(Calendar.MILLISECOND, 0)
+        updateHistoryDetails(goal)
+    }
+
+    /** Selected date navigates together with Week. Calendar never changes database rows. */
+    private fun selectHistoryDay(date: Long) {
+        val today = DailyHistorySummary.startOfDay(System.currentTimeMillis())
+        val min = mDailyHistory?.keys?.minOrNull() ?: today
+        val day = DailyHistorySummary.startOfDay(date)
+        if (day < min || day > today) return
+        mSelectedMonth.timeInMillis = day
+        mCalendarNeedsRefresh = true
+        updateChart()
+        updateCards()
+    }
+
+    private fun moveHistoryDay(amount: Int) {
+        val next = Calendar.getInstance().apply {
+            timeInMillis = mSelectedMonth.timeInMillis
+            add(Calendar.DAY_OF_MONTH, amount)
         }
-        val selectedIndex = (0..6).indexOfFirst { index ->
-            val day = Calendar.getInstance().apply {
-                timeInMillis = week.weekStart
-                add(Calendar.DAY_OF_MONTH, index)
-            }
-            day.timeInMillis == selectedDay.timeInMillis
+        selectHistoryDay(next.timeInMillis)
+    }
+
+    private fun updateHistoryDetails(goal: Int) {
+        val today = DailyHistorySummary.startOfDay(System.currentTimeMillis())
+        val history = mDailyHistory ?: DailyHistorySummary.aggregate(getCachedHistory()).also {
+            mDailyHistory = it
+            mCalendarNeedsRefresh = true
         }
-        val steps = if (selectedIndex >= 0) week.days[selectedIndex] else 0L
-        val liveToday = DateUtils.isToday(selectedDay.timeInMillis)
-        if (selectedIndex >= 0 && (steps > 0L || liveToday)) {
-            mTextViewCalendarContent.text = String.format(
-                Locale.getDefault(), getString(R.string.steps_day_display),
-                selectedDay.timeInMillis, Util.stepsToMeters(steps), steps
-            )
+        val earliest = history.keys.minOrNull() ?: today
+        val info = DailyHistorySummary.describe(
+            selected = mSelectedMonth.timeInMillis,
+            daily = history,
+            todaySteps = mCurrentSteps.coerceAtLeast(0),
+            goal = goal
+        )
+        if (mCalendarNeedsRefresh) {
+            mHistoryCalendar.configure(info.dayStart, earliest, today, history,
+                mCurrentSteps.coerceAtLeast(0), goal)
+            mCalendarNeedsRefresh = false
         } else {
-            mTextViewCalendarContent.text = String.format(
-                Locale.getDefault(), getString(R.string.no_entry), selectedDay.timeInMillis
-            )
+            mHistoryCalendar.updateTodaySteps(mCurrentSteps.coerceAtLeast(0))
+        }
+        val dayTitle = SimpleDateFormat("EEEE d MMMM yyyy", Locale.getDefault())
+            .format(Date(info.dayStart)).replaceFirstChar { it.titlecase(Locale.getDefault()) }
+        findViewById<TextView>(R.id.textViewHistoryDate).text = dayTitle
+        val number = NumberFormat.getIntegerInstance()
+        findViewById<TextView>(R.id.textViewHistorySteps).text =
+            getString(R.string.history_steps_value, number.format(info.steps))
+        findViewById<TextView>(R.id.textViewHistoryPercent).text =
+            getString(R.string.history_goal_percent, info.percent)
+        mHistoryGoalBar.setFraction((info.steps.toDouble() / goal).coerceIn(0.0, 1.0).toFloat())
+        mHistoryGoalBar.contentDescription =
+            getString(R.string.history_goal_percent, info.percent)
+        findViewById<TextView>(R.id.textViewHistoryDistance).text =
+            getString(R.string.history_distance_value, Util.stepsToMeters(info.steps))
+        val label = when {
+            !info.hasData -> getString(R.string.history_no_data)
+            info.goalReached -> getString(R.string.history_goal_met)
+            info.isToday -> getString(R.string.history_in_progress)
+            else -> getString(R.string.history_goal_missed)
+        }
+        findViewById<TextView>(R.id.textViewHistoryStatus).text = if (info.isToday)
+            getString(R.string.history_today_status, label) else label
+        findViewById<TextView>(R.id.historyPreviousDay).apply {
+            isEnabled = info.dayStart > earliest
+            alpha = if (isEnabled) 1f else 0.3f
+        }
+        findViewById<TextView>(R.id.historyNextDay).apply {
+            isEnabled = info.dayStart < today
+            alpha = if (isEnabled) 1f else 0.3f
         }
     }
 
@@ -410,16 +448,20 @@ internal class MainActivity : AppCompatActivity() {
         endOfMonth.timeInMillis = startOfMonth.timeInMillis
         endOfMonth.add(Calendar.MONTH, 1)
 
-        val stepsThisMonth = Database.getInstance(this).getSumSteps(startOfMonth.timeInMillis, endOfMonth.timeInMillis)
-        mMonthlyStepsCard.initialSteps = stepsThisMonth
-        mMonthlyStepsCard.updateSteps(if (currentMonth) mCurrentSteps else 0)
-        mAverageStepsCard.setContent(Database.getInstance(this).avgSteps(startOfMonth.timeInMillis, endOfMonth.timeInMillis))
+        val database = Database.getInstance(this)
+        val stepsThisMonth = database.getSumSteps(startOfMonth.timeInMillis, endOfMonth.timeInMillis)
+        val averageSteps = database.avgSteps(startOfMonth.timeInMillis, endOfMonth.timeInMillis)
+        // The historic total and today's live counter remain separate in the database.
+        val overallSteps = database.getSumSteps(database.firstEntry, database.lastEntry)
+        mGlobalStatsCard.updateHistory(stepsThisMonth, averageSteps, overallSteps, currentMonth)
+        mGlobalStatsCard.updateToday(mCurrentSteps)
     }
 
     companion object {
 
         const val RECEIVER_TAG = "RECEIVER_TAG"
         private const val HISTORY_EXPANDED_KEY = "history_expanded"
+        private const val HISTORY_SELECTED_DAY_KEY = "history_selected_day"
     }
     private fun updateStreakCards() {
         val preferences = PreferenceManager.getDefaultSharedPreferences(this)
@@ -471,6 +513,8 @@ internal class MainActivity : AppCompatActivity() {
                 emptyList()
             }
             mCachedHistoryDay = today
+            mDailyHistory = null
+            mCalendarNeedsRefresh = true
         }
         return mCachedHistory ?: emptyList()
     }
@@ -478,6 +522,16 @@ internal class MainActivity : AppCompatActivity() {
         super.onResume()
         // An import may have changed history while the Settings screen was open.
         mCachedHistory = null
+        mDailyHistory = null
+        mCalendarNeedsRefresh = true
+        // Refresh all card backgrounds without recalculating statistics.
+        val dashboardStyle = PreferenceManager.getDefaultSharedPreferences(this)
+            .getString("dashboard_card_style", "standard") ?: "standard"
+        mAdapter.setDashboardCardStyle(dashboardStyle)
+        mStreakAdapter.setDashboardCardStyle(dashboardStyle)
+        DashboardGradientStyler.applyDashboard(
+            findViewById(android.R.id.content), dashboardStyle == "gradient"
+        )
         // An import from Settings may have changed the week.
         if (::mChart.isInitialized) updateChart()
 

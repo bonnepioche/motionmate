@@ -24,4 +24,8 @@
         <item>L’énergie et la motivation au quotidien.</item>
         <item>Une étoile pour célébrer votre objectif.</item>
     </string-array>
+    <string-array name="dashboard_card_style_entries">
+        <item>Bronze standard</item>
+        <item>Dégradé cuivré (maquette)</item>
+    </string-array>
 </resources>

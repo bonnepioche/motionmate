@@ -14,7 +14,7 @@ import java.util.*
  */
 internal open class MotionTextItem(context: Context, description: Int) : TextItem(context, description) {
 
-    private val format: String = context.getString(R.string.steps_format)
+    private val format: String = context.getString(R.string.steps_card_format)
 
     internal open fun updateSteps(steps: Int) {
         setContent(steps)
