@@ -45,4 +45,5 @@
     <string name="rolling_averages_title">Average steps per day</string>
     <string name="rolling_average_row">%1$d days: %2$s steps/day</string>
     <string name="rolling_averages_caption">Completed days only; missing days count as zero.</string>
+    <string name="today_label">Today</string>
 </resources>

@@ -12,4 +12,16 @@
         <item>09 · Flamme</item>
         <item>10 · Étoile</item>
     </string-array>
+    <string-array name="progress_icon_descriptions">
+        <item>Deux empreintes pour représenter vos pas.</item>
+        <item>Une personne en marche.</item>
+        <item>Un chemin sinueux vers votre objectif.</item>
+        <item>Votre progression vers le sommet.</item>
+        <item>Un anneau avec le pourcentage au centre.</item>
+        <item>Une plante qui grandit avec vos pas.</item>
+        <item>Votre activité au service de la santé.</item>
+        <item>Des marches vers le drapeau d’arrivée.</item>
+        <item>L’énergie et la motivation au quotidien.</item>
+        <item>Une étoile pour célébrer votre objectif.</item>
+    </string-array>
 </resources>

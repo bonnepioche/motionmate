@@ -40,4 +40,16 @@
         <item>01</item><item>02</item><item>03</item><item>04</item><item>05</item>
         <item>06</item><item>07</item><item>08</item><item>09</item><item>10</item>
     </string-array>
+    <string-array name="progress_icon_descriptions">
+        <item>A simple icon representing your steps.</item>
+        <item>A walker in motion.</item>
+        <item>A winding road toward your goal.</item>
+        <item>Climb toward the summit.</item>
+        <item>A clear circular percentage gauge.</item>
+        <item>A plant growing with your steps.</item>
+        <item>Progress for a healthy heart.</item>
+        <item>Steps climbing toward a finish flag.</item>
+        <item>Daily energy and motivation.</item>
+        <item>An achievement star.</item>
+    </string-array>
 </resources>

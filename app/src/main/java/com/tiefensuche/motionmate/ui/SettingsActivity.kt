@@ -5,6 +5,12 @@
 package com.tiefensuche.motionmate.ui
 
 import android.app.Activity
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.drawable.BitmapDrawable
+import android.view.View
+import androidx.appcompat.app.AlertDialog
+import com.tiefensuche.motionmate.stats.ProgressIconOptions
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -52,6 +58,9 @@ class SettingsActivity : AppCompatActivity() {
                 Util.applyTheme(newValue.toString())
                 true
             }
+            findPreference<ListPreference>("progress_icon_style")?.let {
+                updateProgressIconPreview(it)
+            }
             findPreference<Preference>("import")?.setOnPreferenceClickListener {
                 val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
                     addCategory(Intent.CATEGORY_OPENABLE)
@@ -69,6 +78,53 @@ class SettingsActivity : AppCompatActivity() {
                 startActivityForResult(intent, 2)
                 true
             }
+        }
+
+        /** The visual chooser uses the exact ten GoalProgressView drawings from Home. */
+        override fun onDisplayPreferenceDialog(preference: Preference) {
+            if (preference !is ListPreference || preference.key != "progress_icon_style") {
+                super.onDisplayPreferenceDialog(preference)
+                return
+            }
+            val values = preference.entryValues
+            val adapter = ProgressIconPreviewAdapter(
+                requireContext(),
+                preference.entries,
+                values,
+                resources.getStringArray(R.array.progress_icon_descriptions),
+                preference.value
+            )
+            val selected = values.indexOfFirst {
+                it.toString() == ProgressIconOptions.normalize(preference.value)
+            }
+            AlertDialog.Builder(requireContext())
+                .setTitle(R.string.progress_icon_title)
+                .setSingleChoiceItems(adapter, selected) { dialog, position ->
+                    val selectedValue = values[position].toString()
+                    if (preference.callChangeListener(selectedValue)) {
+                        preference.value = selectedValue
+                        updateProgressIconPreview(preference)
+                    }
+                    dialog.dismiss()
+                }
+                .setNegativeButton(android.R.string.cancel, null)
+                .show()
+        }
+
+        /** Display the currently selected symbol directly in the Settings row. */
+        private fun updateProgressIconPreview(preference: ListPreference) {
+            val size = (48f * resources.displayMetrics.density + 0.5f).toInt()
+            val preview = GoalProgressView(requireContext()).apply {
+                setIconStyle(preference.value)
+                setProgress(0.75f, 75)
+            }
+            val exactly = View.MeasureSpec.makeMeasureSpec(size, View.MeasureSpec.EXACTLY)
+            preview.measure(exactly, exactly)
+            preview.layout(0, 0, size, size)
+            val bitmap = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888)
+            preview.draw(Canvas(bitmap))
+            preference.icon = BitmapDrawable(resources, bitmap)
+            preference.isIconSpaceReserved = true
         }
 
         override fun onActivityResult(

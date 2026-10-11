@@ -15,7 +15,7 @@
         android:orientation="vertical"
         android:fitsSystemWindows="true">
 
-        <!-- Steps and distance counter -->
+        <!-- Steps and distance counter: large icon left, responsive text right. -->
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -24,52 +24,59 @@
             app:cardBackgroundColor="@color/bronze_surface"
             app:strokeColor="@color/bronze_outline"
             app:strokeWidth="1dp"
-            app:contentPadding="14dp">
-
+            app:contentPadding="12dp">
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical">
-                <TextView
-                    android:id="@+id/textViewMeters"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:textColor="@color/bronze_primary"
-                    android:textSize="36sp"
-                    android:textStyle="bold" />
-                <TextView
-                    android:id="@+id/textViewSteps"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:textColor="@color/bronze_on_surface"
-                    android:textSize="36sp"
-                    android:textStyle="bold" />
-
-                <!-- Daily target progress, always displayed in the existing bronze palette. -->
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+                <!-- Square viewport prevents the winding path from being cropped. -->
+                <com.tiefensuche.motionmate.ui.GoalProgressView
+                    android:id="@+id/goalProgress"
+                    android:layout_width="128dp"
+                    android:layout_height="128dp"
+                    android:importantForAccessibility="yes" />
                 <LinearLayout
-                    android:layout_width="match_parent"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal"
-                    android:paddingStart="8dp"
-                    android:paddingEnd="8dp">
-                    <com.tiefensuche.motionmate.ui.GoalProgressView
-                        android:id="@+id/goalProgress"
-                        android:layout_width="72dp"
-                        android:layout_height="44dp"
-                        android:importantForAccessibility="yes" />
+                    android:layout_weight="1"
+                    android:layout_marginStart="12dp"
+                    android:orientation="vertical"
+                    android:gravity="center_vertical">
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/today_label"
+                        android:textColor="@color/bronze_on_surface_variant"
+                        android:textSize="13sp" />
+                    <TextView
+                        android:id="@+id/textViewSteps"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:maxLines="1"
+                        android:ellipsize="end"
+                        android:textColor="@color/bronze_on_surface"
+                        android:textStyle="bold"
+                        android:textSize="28sp"
+                        android:autoSizeTextType="uniform"
+                        android:autoSizeMinTextSize="18sp"
+                        android:autoSizeMaxTextSize="28sp"
+                        android:autoSizeStepGranularity="1sp" />
+                    <TextView
+                        android:id="@+id/textViewMeters"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/bronze_primary"
+                        android:textSize="24sp"
+                        android:textStyle="bold" />
                     <TextView
                         android:id="@+id/textViewGoalProgress"
-                        android:layout_width="0dp"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="10dp"
-                        android:layout_weight="1"
-                        android:gravity="center_vertical"
+                        android:layout_marginTop="6dp"
                         android:textColor="@color/bronze_on_surface_variant"
-                        android:textSize="14sp" />
+                        android:textSize="12sp"
+                        android:maxLines="2" />
                 </LinearLayout>
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
